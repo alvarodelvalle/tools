@@ -1,5 +1,5 @@
 // Package main does this....
-package main
+package cmd
 
 import (
 	"context"
@@ -27,8 +27,8 @@ import (
 
 // Usage:
 // #Update repository with permission policy
-// go run ecr.go -y myAWSAccount -r myRegion -d 10m -f ecr-access-policy.json
-func main() {
+// go run ecr-policy.go -y myAWSAccount -r myRegion -d 10m -f ecr-access-policy.json
+func ecrPermissionsPolicy() {
 	var registryId, region, file string
 	var timeout time.Duration
 
@@ -44,7 +44,7 @@ func main() {
 
 	var cancelFn func()
 	if timeout > 0 {
-		ctx, cancelFn = context.WithTimeout(ctx, timeout)
+		_, cancelFn = context.WithTimeout(ctx, timeout)
 	}
 
 	if cancelFn != nil {
@@ -87,12 +87,12 @@ func main() {
 	policyText := string(data)
 	var repos []string
 
-	for _,  v := range describeRepositoriesOutput.Repositories{
+	for _, v := range describeRepositoriesOutput.Repositories {
 		repos = append(repos, *v.RepositoryName)
 	}
 
 	for _, v := range repos {
-		repoName:= v
+		repoName := v
 
 		_, err := svc.SetRepositoryPolicy(&ecr.SetRepositoryPolicyInput{
 			PolicyText:     &policyText,
